@@ -1,33 +1,30 @@
 import { useState } from "react";
 import Button from "@mui/material/Button";
 import ItemsModal from "./components/ItemsModal";
+import { useSelector, useDispatch } from 'react-redux'
+import { addTask, editTask, deleteTask } from "./store/tasksSlice";
+import { RootState } from "./store";
 import "./App.scss";
 import { ToDoItem } from "./interfaces";
 
 
 function App() {
-  const [todoList, setTodoList] = useState<ToDoItem[]>([]);
+  const todoList = useSelector((state: RootState) => state.tasks.tasks)
+  const dispatch = useDispatch()
   const [todoToEdit, setTodoToEdit] = useState<ToDoItem | null>(null)
 
   function saveTodo(todo: ToDoItem) {
-    setTodoList((prevState) => [
-      ...prevState,
-      { title: todo.title, description: todo.description, id: new Date().getTime() },
-    ]);
+    dispatch(addTask({ title: todo.title, description: todo.description, id: new Date().getTime() }))
     setTodoToEdit(null)
   }
 
   function editTodo(todo: ToDoItem) {
-    const index = todoList.findIndex(item => item.id === todo.id)
-    const listCopy = [...todoList]
-    listCopy[index] = todo
-    setTodoList(listCopy)
+    dispatch(editTask(todo))
     setTodoToEdit(null)
   }
 
   function onRemove(id: number) {
-    const filteredList = todoList.filter(item => item.id !== id)
-    setTodoList(filteredList)
+    dispatch(deleteTask(id))
   }
 
   function onEdit(todo: ToDoItem) {
